@@ -1,5 +1,4 @@
 import ply.lex as lex
-
 reserved = {
             "print":"PRINT",
             "if": "IF",
@@ -7,7 +6,14 @@ reserved = {
             "while": "WHILE",
             "for": "FOR",
             "return": "RETURN",
-            "var": "VAR"
+            "var": "VAR",
+            "switch": "SWITCH",
+            "string": "STRING", #lisbllam
+            "int": "INT",       #lisbllam
+            "float": "FLOAT",   #lisbllam
+            "bool": "BOOL",     #lisbllam
+            "const": "CONST",   #lisbllam
+            "final": "FINAL"    #lisbllam
 }
 # List of token names.   This is always required
 tokens = (
@@ -18,14 +24,27 @@ tokens = (
    'DIVIDE',
    'LPAREN',
    'RPAREN',
-   'VARIABLE',
-    'FLOAT',
-    'MAYORQUE',
-    'MENORQUE',
-    'IGUAL',
+   'LCORCH',
+   'RCORCH',
+   'LBRACKET', #anzagood1
+   'RBRACKET', #anzagood1
+   'AND',
+   'OR',
+   'FLOAT_NUMBER',
+   'MAYORQUE',
+   'MENORQUE',
+   'IGUAL',
+   'ID',   #anzagood1
+   'CADENA',    #lisbllam
+   'SEMICOLON',     #lisbllam
+   'COMENTARIO',   #anzagood1
+   'NULLABLE',
+   'METODO',  #anzagood1
 ) + tuple(reserved.values())
 
 # Regular expression rules for simple tokens
+t_COMENTARIO = r'//.*'  #anzagood1
+t_METODO = r'\..*()'    #anzagood1
 t_PLUS    = r'\+'
 t_MINUS   = r'-'
 t_TIMES   = r'\*'
@@ -35,15 +54,33 @@ t_RPAREN  = r'\)'
 t_MAYORQUE = r'\>'
 t_MENORQUE = r'\<'
 t_IGUAL = r'\='
+t_LCORCH = r'\[' #anzagood
+t_RCORCH = r'\]' #anzagood
+t_LBRACKET = r'\{'  #lisbllam
+t_RBRACKET = r'\}'  #lisbllam
+t_AND = r'&&'
+t_OR = r'\|\|'
+t_SEMICOLON = r';' #anzagood
+t_NULLABLE = r'\?' #lisbllam
 
-def t_FLOAT(t):
-    r'\d\.\d'
+
+def t_CADENA(t):    #lisbllam
+    r'\'[^\']*\'|\"[^\"]*\"'
+    return t
+
+def t_FLOAT_NUMBER(t):    #anzagood1
+    r'\d+\.\d+'
     t.value = float(t.value)
     return t
 # A regular expression rule with some action code
-def t_NUMBER(t):
+def t_NUMBER(t):        #anzagood1
     r'\d+'
     t.value = int(t.value)
+    return t
+
+def t_ID(t):        #anzagood1
+    r'[a-zA-Z][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value, 'ID')
     return t
 
 # Define a rule so we can track line numbers
@@ -64,8 +101,9 @@ lexer = lex.lex()
 
 # Test it out
 data = '''
-3 + 4 * 10
-  + -20 *2 9.5 ><=
+var lenguajes = "Si" ;
+lenguajes.programacion();       
+var cualquiercosa = 12; 
 '''
 
 # Give the lexer some input
