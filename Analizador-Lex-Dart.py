@@ -1,4 +1,16 @@
 import ply.lex as lex
+from datetime import datetime
+
+#log file preparation
+now = datetime.now()
+formatDate = now.strftime("%d-%m-%Y-%Hh%M")
+
+user = input('Inserta tu usuario: ')
+
+logfile = f"logs/lexico-"+user+"-"+formatDate+".txt"
+
+#lexer tokens
+
 reserved = {
             "print":"PRINT",
             "if": "IF",
@@ -72,7 +84,8 @@ tokens = (
    'BIT_XOR', #gilmaramg66
    'BIT_NOT', #gilmaramg66
    'LSHIFT', #gilmaramg66
-   'RSHIFT' #gilmaramg66
+   'RSHIFT', #gilmaramg66
+    'COMMA' #gilmaramg66
 ) + tuple(reserved.values())
 
 # Regular expression rules for simple tokens
@@ -106,6 +119,7 @@ t_BIT_NOT = r'~' #gilmaramg66
 t_BIT_XOR = r'\^' #gilmaramg66
 t_LSHIFT = r'<<' #gilmaramg66
 t_RSHIFT = r'>>' #gilmaramg66
+t_COMMA = r',' #gilmaramg66
 
 
 def t_CADENA(t):    #lisbllam
@@ -141,7 +155,8 @@ t_ignore  = ' \t'
 
 # Error handling rule
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    with open(logfile, 'a') as file:
+        file.write("Illegal character '%s'\n" % t.value[0])
     t.lexer.skip(1)
 
 # Build the lexer
@@ -151,7 +166,7 @@ lexer = lex.lex()
 data = '''
 var lenguajes = "Si" ;
 lenguajes.programacion();       
-var cualquiercosa = 12; 
+var cualquiercosa = 12;
 '''
 
 # Give the lexer some input
@@ -162,4 +177,5 @@ while True:
     tok = lexer.token()
     if not tok:
         break      # No more input
-    print(tok)
+    with open(logfile, 'a') as file:
+        file.write(str(tok)+"\n")
