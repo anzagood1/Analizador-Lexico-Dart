@@ -35,6 +35,8 @@ def p_sentencia(p):
                 | imprimirvariable
                 | imprimirexpresion
                 | concatenarcadenas
+                | factoryqueue
+                | explicitqueue
     '''
 
 
@@ -106,10 +108,19 @@ def p_valoresnumericos(p):
     '''valoresnumericos : NUMBER
                         | FLOAT_NUMBER
     '''
+#Estructura Cola
+def p_factoryqueue(p):
+    ''' listqueue : QUEUE MENORQUE tipodato MAYORQUE ID IGUAL QUEUE MENORQUE tipodato MAYORQUE LPAREN RPAREN SEMICOLON
+    '''
+
+def p_explicitqueue(p):
+    ''' explicitqueue : LIST_QUEUE MENORQUE tipodato MAYORQUE ID IGUAL LIST_QUEUE MENORQUE tipodato MAYORQUE LPAREN RPAREN SEMICOLON
+        | QUEUE MENORQUE tipodato MAYORQUE ID IGUAL LIST_QUEUE MENORQUE tipodato MAYORQUE LPAREN RPAREN SEMICOLON
+    '''
 
 def p_sentenciafor(p):
-    '''sentenciafor : FOR LPAREN VAR ID IGUAL NUMBER SEMICOLON ID forcomparador NUMBER SEMICOLON ID forunarios RPAREN LBRACKET sentencias RBRACKET
-                        | FOR LPAREN INT ID IGUAL NUMBER SEMICOLON ID forcomparador NUMBER SEMICOLON ID forunarios RPAREN LBRACKET sentencias RBRACKET
+    '''sentenciafor : FOR LPAREN VAR ID IGUAL NUMBER SEMICOLON exp_logica SEMICOLON ID forunarios RPAREN LBRACKET sentencias RBRACKET
+                        | FOR LPAREN INT ID IGUAL NUMBER SEMICOLON exp_logica SEMICOLON ID forunarios RPAREN LBRACKET sentencias RBRACKET
                         | FOR LPAREN VAR ID IN ID RPAREN LBRACKET sentencias RBRACKET
                         | FOR LPAREN tipodato ID IN ID RPAREN LBRACKET sentencias RBRACKET'''
 
