@@ -259,6 +259,30 @@ def p_if_else_if(p):
     '''
 
 
+#USO DE CLASES ABSTRACTAS
+def p_abstract_f(p):
+    '''
+    abstract_f : tipodato ID LPAREN RPAREN SEMICOLON
+                | VOID ID LPAREN RPAREN SEMICOLON
+    '''
+
+def p_abstract_sent(p):
+    '''
+    abstract_sent : abstract_f
+                    | abstract_sent abstract_f
+    '''
+def p_abstractclass(p):
+    '''
+    abstract_class : ABSTRACT CLASS LBRACKET abstract_sent RBRACKET
+    abstract_class: ABSTRACT CLASS LBRACKET RBRACKET
+    '''
+
+def p_class_declare(p):
+    '''
+    class_declare : CLASS ID LBRACKET sentencias RBRACKET
+                  | CLASS ID IMPLEMENTS ID LBRACKET sentencias RBRACKET
+    '''
+
 
 
 
