@@ -30,6 +30,11 @@ def p_sentencia(p):
                 | set_literal
                 | if_else
                 | if_else_if
+                | expresionaritmetica
+                | imprimircadena
+                | imprimirvariable
+                | imprimirexpresion
+                | concatenarcadenas
     '''
 
 
@@ -48,7 +53,9 @@ def p_declaracion_func_void(p):
     '''
 
 def p_declaracion_list(p):
-    'declaracion_list : tipodato ID IGUAL LCORCH RCORCH SEMICOLON'
+    '''declaracion_list : tipodato ID IGUAL LCORCH RCORCH SEMICOLON
+                        | VAR ID IGUAL LCORCH RCORCH SEMICOLON
+    '''
 
 def p_sentenciawhile(p):
     '''sentenciawhile : WHILE LPAREN exp_logica RPAREN RBRACKET sentencias RBRACKET
@@ -65,7 +72,7 @@ def p_imprimirexpresion(p):
     'imprimirexpresion : PRINT LPAREN expresion RPAREN SEMICOLON'
 
 def p_expresionaritmetica(p):
-    '''exprearitmetica : valoresnumericos PLUS valoresnumericos
+    '''expresionaritmetica : valoresnumericos PLUS valoresnumericos
                         | valoresnumericos MINUS valoresnumericos
                         | valoresnumericos TIMES valoresnumericos
                         | valoresnumericos DIVIDE valoresnumericos
@@ -76,8 +83,11 @@ def p_expresionaritmetica(p):
 def p_expresion(p):
     '''expresion : valor PLUS valor
                 | valor MINUS valor
-                | exprearitmetica
+                | expresionaritmetica
     '''
+
+def p_concatenarcadenas(p):
+    'concatenarcadenas : CADENA PLUS CADENA SEMICOLON'
 
 def p_parametro(p):
     'parametro : tipodato ID'
