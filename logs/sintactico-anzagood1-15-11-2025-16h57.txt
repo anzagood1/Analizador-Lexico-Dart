@@ -1,0 +1,71 @@
+sintactico-anzagood1-15-11-2025-16h57.txt
+
+LexToken(VAR,'var',2,1)
+LexToken(ID,'lenguajes',2,5)
+LexToken(IGUAL,'=',2,15)
+LexToken(ID,'casa',2,17)
+LexToken(IS,'is',2,22)
+LexToken(ID,'home',2,25)
+LexToken(SEMICOLON,';',2,30)
+LexToken(ID,'lenguajes',3,32)
+LexToken(METODO,'.programacion();       ',3,41)
+LexToken(VAR,'var',4,65)
+LexToken(ID,'cualquiercosa',4,69)
+LexToken(IGUAL,'=',4,83)
+LexToken(NUMBER,12,4,85)
+LexToken(SEMICOLON,';',4,87)
+WARNING: Token 'ABSTRACT' defined, but not used
+WARNING: Token 'AS' defined, but not used
+WARNING: Token 'ASSERT' defined, but not used
+WARNING: Token 'BIT_AND' defined, but not used
+WARNING: Token 'BIT_NOT' defined, but not used
+WARNING: Token 'BIT_OR' defined, but not used
+WARNING: Token 'BIT_XOR' defined, but not used
+WARNING: Token 'BREAK' defined, but not used
+WARNING: Token 'CATCH' defined, but not used
+WARNING: Token 'COLON' defined, but not used
+WARNING: Token 'COMENTARIO' defined, but not used
+WARNING: Token 'COMMENTBLOCK' defined, but not used
+WARNING: Token 'CONST' defined, but not used
+WARNING: Token 'DIVIDE' defined, but not used
+WARNING: Token 'DO' defined, but not used
+WARNING: Token 'DOLLAR' defined, but not used
+WARNING: Token 'ELSE' defined, but not used
+WARNING: Token 'EXTENDS' defined, but not used
+WARNING: Token 'FINAL' defined, but not used
+WARNING: Token 'FOR' defined, but not used
+WARNING: Token 'HASH' defined, but not used
+WARNING: Token 'IMPLEMENTS' defined, but not used
+WARNING: Token 'IMPORT' defined, but not used
+WARNING: Token 'INTERFACE' defined, but not used
+WARNING: Token 'LAMBDA' defined, but not used
+WARNING: Token 'LIBRARY' defined, but not used
+WARNING: Token 'LSHIFT' defined, but not used
+WARNING: Token 'METODO' defined, but not used
+WARNING: Token 'MINUS' defined, but not used
+WARNING: Token 'NULL' defined, but not used
+WARNING: Token 'NULLABLE' defined, but not used
+WARNING: Token 'PLUS' defined, but not used
+WARNING: Token 'PRINT' defined, but not used
+WARNING: Token 'RSHIFT' defined, but not used
+WARNING: Token 'SET' defined, but not used
+WARNING: Token 'STATIC' defined, but not used
+WARNING: Token 'SUPER' defined, but not used
+WARNING: Token 'SWITCH' defined, but not used
+WARNING: Token 'THROW' defined, but not used
+WARNING: Token 'TIMES' defined, but not used
+WARNING: Token 'TRY' defined, but not used
+WARNING: There are 41 unused tokens
+Generating LALR tables
+WARNING: 7 shift/reduce conflicts
+WARNING: 63 reduce/reduce conflicts
+WARNING: reduce/reduce conflict in state 7 resolved using rule (sentencia -> valorbool)
+WARNING: rejected rule (exprbool -> valorbool) in state 7
+WARNING: reduce/reduce conflict in state 10 resolved using rule (sentencia -> parametro)
+WARNING: rejected rule (parametros -> parametro) in state 10
+WARNING: reduce/reduce conflict in state 12 resolved using rule (sentencia -> exprbool)
+WARNING: rejected rule (expresionesbool -> exprbool) in state 12
+python > if(a==b){a=2;}
+None
+python > if(2==3){s="arroz";}
+None 

@@ -1,0 +1,82 @@
+sintactico-anzagood1-15-11-2025-17h46
+LexToken(VAR,'var',2,1)
+LexToken(ID,'lenguajes',2,5)
+LexToken(IGUAL,'=',2,15)
+LexToken(ID,'casa',2,17)
+LexToken(IS,'is',2,22)
+LexToken(ID,'home',2,25)
+LexToken(SEMICOLON,';',2,30)
+LexToken(ID,'lenguajes',3,32)
+LexToken(METODO,'.programacion();       ',3,41)
+LexToken(VAR,'var',4,65)
+LexToken(ID,'cualquiercosa',4,69)
+LexToken(IGUAL,'=',4,83)
+LexToken(NUMBER,12,4,85)
+LexToken(SEMICOLON,';',4,87)
+WARNING: C:\Users\vagac\school\Analizador-Lexico-Dart\AnalizadorSinDart.py:69: Possible grammar rule 'd_expresion' defined without p_ prefix
+WARNING: Token 'ABSTRACT' defined, but not used
+WARNING: Token 'AS' defined, but not used
+WARNING: Token 'ASSERT' defined, but not used
+WARNING: Token 'BIT_AND' defined, but not used
+WARNING: Token 'BIT_NOT' defined, but not used
+WARNING: Token 'BIT_OR' defined, but not used
+WARNING: Token 'BIT_XOR' defined, but not used
+WARNING: Token 'BREAK' defined, but not used
+WARNING: Token 'CATCH' defined, but not used
+WARNING: Token 'COLON' defined, but not used
+WARNING: Token 'COMENTARIO' defined, but not used
+WARNING: Token 'COMMENTBLOCK' defined, but not used
+WARNING: Token 'CONST' defined, but not used
+WARNING: Token 'DO' defined, but not used
+WARNING: Token 'DOLLAR' defined, but not used
+WARNING: Token 'ELSE' defined, but not used
+WARNING: Token 'EXTENDS' defined, but not used
+WARNING: Token 'FINAL' defined, but not used
+WARNING: Token 'HASH' defined, but not used
+WARNING: Token 'IMPLEMENTS' defined, but not used
+WARNING: Token 'IMPORT' defined, but not used
+WARNING: Token 'INTERFACE' defined, but not used
+WARNING: Token 'LAMBDA' defined, but not used
+WARNING: Token 'LIBRARY' defined, but not used
+WARNING: Token 'LSHIFT' defined, but not used
+WARNING: Token 'METODO' defined, but not used
+WARNING: Token 'NULL' defined, but not used
+WARNING: Token 'NULLABLE' defined, but not used
+WARNING: Token 'RSHIFT' defined, but not used
+WARNING: Token 'SET' defined, but not used
+WARNING: Token 'STATIC' defined, but not used
+WARNING: Token 'SUPER' defined, but not used
+WARNING: Token 'SWITCH' defined, but not used
+WARNING: Token 'THROW' defined, but not used
+WARNING: Token 'TRY' defined, but not used
+WARNING: C:\Users\vagac\school\Analizador-Lexico-Dart\AnalizadorSinDart.py:54: Rule 'imprimircadena' defined, but not used
+WARNING: C:\Users\vagac\school\Analizador-Lexico-Dart\AnalizadorSinDart.py:57: Rule 'imprimirvariable' defined, but not used
+WARNING: C:\Users\vagac\school\Analizador-Lexico-Dart\AnalizadorSinDart.py:60: Rule 'imprimirexpresion' defined, but not used
+WARNING: C:\Users\vagac\school\Analizador-Lexico-Dart\AnalizadorSinDart.py:63: Rule 'exprearitmetica' defined, but not used
+WARNING: There are 35 unused tokens
+WARNING: There are 4 unused rules
+WARNING: Symbol 'imprimircadena' is unreachable
+WARNING: Symbol 'imprimirvariable' is unreachable
+WARNING: Symbol 'imprimirexpresion' is unreachable
+WARNING: Symbol 'exprearitmetica' is unreachable
+WARNING: Symbol 'valoresnumericos' is unreachable
+Generating LALR tables
+WARNING: 32 shift/reduce conflicts
+WARNING: 142 reduce/reduce conflicts
+WARNING: reduce/reduce conflict in state 7 resolved using rule (sentencia -> valorbool)
+WARNING: rejected rule (exprbool -> valorbool) in state 7
+WARNING: reduce/reduce conflict in state 10 resolved using rule (sentencia -> parametro)
+WARNING: rejected rule (parametros -> parametro) in state 10
+WARNING: reduce/reduce conflict in state 12 resolved using rule (sentencia -> exprbool)
+WARNING: rejected rule (expresionesbool -> exprbool) in state 12
+WARNING: reduce/reduce conflict in state 36 resolved using rule (forcomparador -> MAYORQUE)
+WARNING: rejected rule (comparador -> MAYORQUE) in state 36
+WARNING: reduce/reduce conflict in state 37 resolved using rule (forcomparador -> MENORQUE)
+WARNING: rejected rule (comparador -> MENORQUE) in state 37
+WARNING: reduce/reduce conflict in state 58 resolved using rule (forcomparador -> NOT IGUAL)
+WARNING: rejected rule (comparador -> NOT IGUAL) in state 58
+python > for(int i = 0; i < 0; i--){casa = vacia;}
+None
+python > for(var i = 0; i < 0; i--){casa = vacia;}
+None
+python > 
