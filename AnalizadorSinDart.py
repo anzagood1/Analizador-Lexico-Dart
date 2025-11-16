@@ -28,6 +28,8 @@ def p_sentencia(p):
                 | lambda_function
                 | set_declare
                 | set_literal
+                | if_else
+                | if_else_if
     '''
 
 
@@ -154,6 +156,7 @@ def p_lambda_function(p):
     '''
 
 #expresiones relacionales
+
 def p_condition(p):
     '''
     condition : valor comparador valor
@@ -163,7 +166,6 @@ def p_condition(p):
     '''
 
 #expresiones logicas
-
 
 def p_exp_logica(p):
     '''
@@ -196,8 +198,39 @@ def p_set_declare(p):
                 | SET MENORQUE tipodato MAYORQUE ID IGUAL set_literal SEMICOLON
     '''
 
+
 def p_error(p):
     print("Error de sintaxis en la linea %d" % p.lineno)
+
+#Estructura if else / if else if
+
+def p_sentencia_else(p):
+    '''
+    sentencia_else : ELSE LBRACKET sentencias RBRACKET
+                   | ELSE LBRACKET sentencias RETURN valorreturn RBRACKET
+
+    '''
+
+def p_sentencia_elif(p):
+    '''
+    sentencia_elif : ELSE IF LPAREN exp_logica RPAREN LBRACKET sentencias RBRACKET
+                   | ELSE IF LPAREN exp_logica RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET
+    '''
+def p_elif_nest(p):
+    '''
+    elif_nest : sentencia_elif
+              | elif_nest sentencia_elif
+    '''
+def p_if_else(p):
+    'if_else : sentenciaif sentencia_else'
+
+def p_if_else_if(p):
+    '''
+    if_else_if : sentenciaif elif_nest sentencia_else
+               | sentenciaif elif_nest
+    '''
+
+
 
 
 
