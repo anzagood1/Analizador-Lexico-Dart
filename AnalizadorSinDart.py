@@ -37,6 +37,8 @@ def p_sentencia(p):
                 | concatenarcadenas
                 | factoryqueue
                 | explicitqueue
+                | funcion_asincrona
+                | declaracion_con_await
     '''
 
 
@@ -112,7 +114,7 @@ def p_valoresnumericos(p):
     '''
 #Estructura Cola
 def p_factoryqueue(p):
-    ''' listqueue : QUEUE MENORQUE tipodato MAYORQUE ID IGUAL QUEUE MENORQUE tipodato MAYORQUE LPAREN RPAREN SEMICOLON
+    ''' factoryqueue : QUEUE MENORQUE tipodato MAYORQUE ID IGUAL QUEUE MENORQUE tipodato MAYORQUE LPAREN RPAREN SEMICOLON
     '''
 
 def p_explicitqueue(p):
@@ -283,7 +285,16 @@ def p_class_declare(p):
                   | CLASS ID IMPLEMENTS ID LBRACKET sentencias RBRACKET
     '''
 
+def p_funcion_asincrona(p):
+    '''
+    funcion_asincrona : MENORQUE FUTURE MAYORQUE ID LPAREN RPAREN LBRACKET RETURN FUTURE RBRACKET
+                        | tipodato ID LPAREN RPAREN ASYNC LBRACKET sentencia RBRACKET
+    '''
 
+def p_declaracion_con_await(p):
+    '''
+    declaracion_con_await : tipodato ID IGUAL AWAIT ID LPAREN RPAREN SEMICOLON
+    '''
 
 
 parser = yacc.yacc()
