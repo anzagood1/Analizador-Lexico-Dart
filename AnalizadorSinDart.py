@@ -55,11 +55,13 @@ def p_declaracion_func_void(p):
 def p_declaracion_list(p):
     '''declaracion_list : tipodato ID IGUAL LCORCH RCORCH SEMICOLON
                         | VAR ID IGUAL LCORCH RCORCH SEMICOLON
+                        | VAR ID IGUAL LCORCH valoresenlistados RCORCH SEMICOLON
+                        | tipodato ID IGUAL LCORCH valoresenlistados RCORCH SEMICOLON
     '''
 
 def p_sentenciawhile(p):
-    '''sentenciawhile : WHILE LPAREN exp_logica RPAREN RBRACKET sentencias RBRACKET
-                        | WHILE LPAREN exp_logica RPAREN RBRACKET sentencias RETURN valorreturn RBRACKET
+    '''sentenciawhile : WHILE LPAREN exp_logica RPAREN LBRACKET sentencias RBRACKET
+                        | WHILE LPAREN exp_logica RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET
     '''
 
 def p_imprimircadena(p):
@@ -105,6 +107,11 @@ def p_valorreturn(p):
 def p_valoresnumericos(p):
     '''valoresnumericos : NUMBER
                         | FLOAT_NUMBER
+    '''
+
+def p_valoresenlistados(p):
+    '''valoresenlistados : valor COMA valor
+                        | valor COMA valoresenlistados
     '''
 
 def p_sentenciafor(p):

@@ -1,0 +1,43 @@
+/usr/local/bin/python3.12 /Users/lissy/Analizador-Lexico-Dart/AnalizadorSinDart.py 
+LexToken(LAMBDA,'=>',2,1)
+LexToken(ID,'a',3,4)
+LexToken(PLUS,'+',4,6)
+LexToken(ID,'b',5,8)
+LexToken(SEMICOLON,';',6,10)
+LexToken(INT,'int',7,12)
+LexToken(ID,'aver',7,16)
+LexToken(LPAREN,'(',7,20)
+LexToken(INT,'int',7,21)
+LexToken(ID,'a',7,25)
+LexToken(COMA,',',7,26)
+LexToken(INT,'int',7,28)
+LexToken(ID,'b',7,32)
+LexToken(RPAREN,')',7,33)
+LexToken(LAMBDA,'=>',7,35)
+LexToken(ID,'a',7,38)
+LexToken(PLUS,'+',7,40)
+LexToken(ID,'b',7,42)
+LexToken(SEMICOLON,';',7,43)
+python > var lista = [];
+None
+python > int lista = [];
+None
+python > pritn(3+2);
+Error de sintaxis en la linea 8
+None
+python > print(3+2);
+None
+python > print("hola"+"que tal");
+None
+python > 3*5
+None
+python > int dia= 3;
+None
+python > dia = 5;
+None
+python > cielo = lindo;
+None
+python > print(id);
+None
+python > print(hola+id);
+None
