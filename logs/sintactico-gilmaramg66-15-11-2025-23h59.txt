@@ -1,0 +1,9 @@
+python > var numeros = <int>{1,2,3};
+None
+python > if (a>b) {x=1;} else if (a==b) {x=0;} else{ x=-1;}
+Error de sintaxis en la linea 8
+None
+python > if (a>b) {x=1;} else if (a==b) {x=0;} else { x=2;}
+None
+python > int suma (int a, int b) => a+b;
+None

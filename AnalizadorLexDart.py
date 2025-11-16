@@ -4,6 +4,8 @@ reserved = {
     "print": "PRINT",
     "if": "IF",
     "in": "IN",
+    "Queue" : "QUEUE",
+    "ListQueue" : "LIST_QUEUE",
     "is": "IS",
     "else": "ELSE",
     "while": "WHILE",
