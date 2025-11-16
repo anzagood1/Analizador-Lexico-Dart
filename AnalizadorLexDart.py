@@ -11,7 +11,7 @@ reserved = {
     "return": "RETURN",
     "var": "VAR",
     "switch": "SWITCH",
-    "string": "STRING",  # lisbllam
+    "String": "STRING",  # lisbllam
     "int": "INT",  # lisbllam
     "float": "FLOAT",  # lisbllam
     "bool": "BOOL",  # lisbllam
@@ -88,9 +88,9 @@ t_TIMES = r'\*'
 t_DIVIDE = r'/'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
-t_MAYORQUE = r'\>'
-t_MENORQUE = r'\<'
-t_IGUAL = r'\='
+t_MAYORQUE = r'>'
+t_MENORQUE = r'<'
+t_IGUAL = r'='
 t_LCORCH = r'\['  # anzagood
 t_RCORCH = r'\]'  # anzagood
 t_LBRACKET = r'\{'  # lisbllam
@@ -163,9 +163,12 @@ lexer = lex.lex()
 
 # Test it out
 data = '''
-var lenguajes = casa is home ;
-lenguajes.programacion();       
-var cualquiercosa = 12; 
+=>
+a
++
+b
+;
+int aver(int a, int b) => a + b;
 '''
 
 # Give the lexer some input

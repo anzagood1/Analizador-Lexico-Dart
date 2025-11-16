@@ -16,8 +16,8 @@ def p_sentencia(p):
                 | valor
                 | tipodato
                 | parametro
-                | expresionesbool
-                | exprbool
+                | condition
+                | exp_logica
                 | declaracion_list
                 | sentenciawhile
                 | parametros
@@ -25,6 +25,9 @@ def p_sentencia(p):
                 | sentenciafor
                 | forcomparador
                 | forunarios
+                | lambda_function
+                | set_declare
+                | set_literal
     '''
 
 
@@ -46,8 +49,8 @@ def p_declaracion_list(p):
     'declaracion_list : tipodato ID IGUAL LCORCH RCORCH SEMICOLON'
 
 def p_sentenciawhile(p):
-    '''sentenciawhile : WHILE LPAREN expresionesbool RPAREN RBRACKET sentencias RBRACKET
-                        | WHILE LPAREN expresionesbool RPAREN RBRACKET sentencias RETURN valorreturn RBRACKET
+    '''sentenciawhile : WHILE LPAREN exp_logica RPAREN RBRACKET sentencias RBRACKET
+                        | WHILE LPAREN exp_logica RPAREN RBRACKET sentencias RETURN valorreturn RBRACKET
     '''
 
 def p_imprimircadena(p):
@@ -57,18 +60,21 @@ def p_imprimirvariable(p):
     'imprimirvariable : PRINT LPAREN ID RPAREN SEMICOLON'
 
 def p_imprimirexpresion(p):
-    'imprimirexpresion : PRINT LPAREN SEMICOLON'
+    'imprimirexpresion : PRINT LPAREN expresion RPAREN SEMICOLON'
 
 def p_expresionaritmetica(p):
     '''exprearitmetica : valoresnumericos PLUS valoresnumericos
                         | valoresnumericos MINUS valoresnumericos
                         | valoresnumericos TIMES valoresnumericos
                         | valoresnumericos DIVIDE valoresnumericos
+                        | ID TIMES ID
+                        | ID DIVIDE ID
     '''
 
-def d_expresion(p):
-    '''expresion : ID PLUS CADENA
-                | expresionaritmeticq
+def p_expresion(p):
+    '''expresion : valor PLUS valor
+                | valor MINUS valor
+                | exprearitmetica
     '''
 
 def p_parametro(p):
@@ -76,7 +82,7 @@ def p_parametro(p):
 
 def p_parametros(p):
     '''parametros : parametro
-                    | parametro COMA parametros
+                    | parametros COMA parametro
     '''
 
 def p_valorreturn(p):
@@ -115,8 +121,8 @@ def p_forunarios(p):
 
 
 def p_sentenciaif(p):
-    '''sentenciaif : IF LPAREN expresionesbool RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET
-                    | IF LPAREN expresionesbool RPAREN LBRACKET sentencias RBRACKET
+    '''sentenciaif : IF LPAREN exp_logica RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET
+                    | IF LPAREN exp_logica RPAREN LBRACKET sentencias RBRACKET
     '''
 
 def p_valorbool(p):
@@ -132,27 +138,68 @@ def p_comparador(p):
                     | MENORQUE
                     | NOT IGUAL
     '''
-def p_expresionesbool(p):
-    '''expresionesbool : exprbool
-                         | NOT exprbool
-                         | exprbool AND LPAREN expresionesbool RPAREN
-                         | exprbool OR LPAREN expresionesbool RPAREN
-    '''
-
-def p_exprbool(p):
-    '''exprbool : valor comparador valor
-                  | ID IS tipodato
-                  | valorbool
-                  | ID comparador ID
-    '''
 
 def p_valor(p):
-    '''valor : CADENA
-            | FLOAT_NUMBER
-            | NUMBER'''
+    '''
+    valor : ID
+            | valoresnumericos
+            | CADENA
+    '''
+
+#Lambda function
+
+def p_lambda_function(p):
+    '''
+    lambda_function : tipodato ID  LPAREN parametros RPAREN LAMBDA expresion SEMICOLON
+    '''
+
+#expresiones relacionales
+def p_condition(p):
+    '''
+    condition : valor comparador valor
+              | valorbool comparador valorbool
+              | valor comparador valorbool
+              | valorbool comparador valor
+    '''
+
+#expresiones logicas
+
+
+def p_exp_logica(p):
+    '''
+    exp_logica : exp_logica OR exp_logica
+                | exp_logica AND exp_logica
+                | NOT exp_logica
+                | LPAREN exp_logica RPAREN
+                | condition
+                | valorbool
+                | ID
+    '''
+
+#Estructura de datos: SET
+
+def p_elements(p):
+    '''
+    elements : valor
+            | elements COMA valor
+    '''
+
+def p_set_literal(p):
+    '''
+    set_literal : LBRACKET RBRACKET
+                | LBRACKET elements RBRACKET
+    '''
+
+def p_set_declare(p):
+    '''
+    set_declare : VAR ID IGUAL MENORQUE tipodato MAYORQUE set_literal SEMICOLON
+                | SET MENORQUE tipodato MAYORQUE ID IGUAL set_literal SEMICOLON
+    '''
 
 def p_error(p):
     print("Error de sintaxis en la linea %d" % p.lineno)
+
+
 
 parser = yacc.yacc()
 
