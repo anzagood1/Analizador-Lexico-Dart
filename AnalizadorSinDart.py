@@ -1,6 +1,14 @@
 import ply.yacc as yacc
 from AnalizadorLexDart import tokens
 
+#TABLA DE SIMBOLOS
+tabla_simbolos={
+    'variables':{},
+    'tipos':{
+        'str-funciones':['split','contains','startsWith','endsWith','toUpperCase','toLowerCase','substring','trim','replaceAll']
+    }
+}
+
 start = 'sentencias'
 
 def p_sentencias(p):
@@ -43,9 +51,12 @@ def p_sentencia(p):
 
 
 def p_asignacion_variables(p):
-    '''asignacion_variables : ID IGUAL valor SEMICOLON
-                            | ID IGUAL ID SEMICOLON
-    '''
+    'asignacion_variables : ID IGUAL valor SEMICOLON'
+    nombre = p[1]
+    tipo = p[3]
+    if tipo != None:
+        tabla_simbolos['variables'][nombre] = tipo
+        print(tabla_simbolos)
 
 def p_declaracion_variables(p):
     '''declaracion_variables : tipodato ID IGUAL valor SEMICOLON
@@ -112,6 +123,11 @@ def p_valoresnumericos(p):
     '''valoresnumericos : NUMBER
                         | FLOAT_NUMBER
     '''
+    if p.slice[1].type == "NUMBER":
+        p[0] = 'int'
+    elif p.slice[1].type == "FLOAT_NUMBER":
+        p[0] = 'float'
+
 #Estructura Cola
 def p_factoryqueue(p):
     ''' factoryqueue : QUEUE MENORQUE tipodato MAYORQUE ID IGUAL QUEUE MENORQUE tipodato MAYORQUE LPAREN RPAREN SEMICOLON
@@ -173,10 +189,23 @@ def p_comparador(p):
 
 def p_valor(p):
     '''
-    valor : ID
-            | valoresnumericos
+    valor : valoresnumericos
             | CADENA
+            | ID
     '''
+    token_type = p.slice[1].type
+
+    if token_type == "ID":
+        nombre = p[1]
+        if nombre not in tabla_simbolos['variables']:
+            print(f"Error semántico: la variable {nombre} no está declarada")
+        else:
+            p[0] = tabla_simbolos['variables'][nombre]
+    elif token_type == "CADENA":
+        p[0] = "str"
+    else:
+        # valoresnumericos devuelve 'int' o 'float'
+        p[0] = p[1]
 
 #Lambda function
 
@@ -276,7 +305,7 @@ def p_abstract_sent(p):
 def p_abstractclass(p):
     '''
     abstract_class : ABSTRACT CLASS LBRACKET abstract_sent RBRACKET
-    abstract_class: ABSTRACT CLASS LBRACKET RBRACKET
+                   | ABSTRACT CLASS LBRACKET RBRACKET
     '''
 
 def p_class_declare(p):
@@ -301,7 +330,7 @@ parser = yacc.yacc()
 
 while True:
     try:
-        s = input('python > ')
+        s = input('dart > ')
     except EOFError:
         break
     if not s: continue

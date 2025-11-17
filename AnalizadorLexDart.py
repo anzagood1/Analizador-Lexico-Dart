@@ -1,48 +1,48 @@
 import ply.lex as lex
 
 reserved = {
-    "print": "PRINT",
-    "if": "IF",
-    "in": "IN",
-    "Future": "FUTURE",
+        "abstract": "ABSTRACT",  # gilmaramg66
+    "as": "AS",  # gilmaramg66
+    "assert": "ASSERT",  # gilmaramg66
     "async": "ASYNC",
     "await": "AWAIT",
-    "Queue" : "QUEUE",
-    "ListQueue" : "LIST_QUEUE",
-    "is": "IS",
-    "else": "ELSE",
-    "while": "WHILE",
-    "for": "FOR",
-    "return": "RETURN",
-    "var": "VAR",
-    "switch": "SWITCH",
-    "String": "STRING",  # lisbllam
-    "int": "INT",  # lisbllam
-    "float": "FLOAT",  # lisbllam
     "bool": "BOOL",  # lisbllam
-    "const": "CONST",  # lisbllam
-    "final": "FINAL",  # lisbllam
-    "null": "NULL",  # gilmaramg66
-    "true": "TRUE",  # gilmaramg66
-    "false": "FALSE",  # gilmaramg66
     "break": "BREAK",  # gilmaramg66
-    "void": "VOID",  # gilmaramg66
-    "try": "TRY",  # gilmaramg66
     "catch": "CATCH",  # gilmaramg66
-    "throw": "THROW",  # gilmaramg66
-    "assert": "ASSERT",  # gilmaramg66
-    "static": "STATIC",  # gilmaramg66
-    "abstract": "ABSTRACT",  # gilmaramg66
-    "interface": "INTERFACE",  # gilmaramg66
+    "class": "CLASS",
+    "const": "CONST",  # lisbllam
+    "do": "DO",  # gilmaramg66
+    "else": "ELSE",
     "extends": "EXTENDS",  # gilmaramg66
+    "false": "FALSE",  # gilmaramg66
+    "final": "FINAL",  # lisbllam
+    "float": "FLOAT",  # lisbllam
+    "for": "FOR",
+    "Future": "FUTURE",
+    "if": "IF",
     "implements": "IMPLEMENTS",  # gilmaramg66
-    "super": "SUPER",  # gilmaramg66
-    "as": "AS",  # gilmaramg66
-    "set": "SET",  # gilmaramg66
     "import": "IMPORT",  # gilmaramg66
+    "in": "IN",
+    "interface": "INTERFACE",  # gilmaramg66
+    "int": "INT",  # lisbllam
+    "is": "IS",
     "library": "LIBRARY",  # gilmaramg66
-    "do": "DO"  # gilmaramg66
-
+    "ListQueue": "LIST_QUEUE",
+    "null": "NULL",  # gilmaramg66
+    "print": "PRINT",
+    "Queue" : "QUEUE",
+    "return": "RETURN",
+    "set": "SET",  # gilmaramg66
+    "static": "STATIC",  # gilmaramg66
+    "String": "STRING",  # lisbllam
+    "super": "SUPER",  # gilmaramg66
+    "switch": "SWITCH",
+    "throw": "THROW",  # gilmaramg66
+    "true": "TRUE",  # gilmaramg66
+    "try": "TRY",  # gilmaramg66
+    "var": "VAR",
+    "void": "VOID",  # gilmaramg66
+    "while": "WHILE"
 }
 # List of token names.   This is always required
 tokens = (
