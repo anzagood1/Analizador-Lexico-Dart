@@ -1,0 +1,46 @@
+/usr/local/bin/python3.14 /Users/gili66/Documents/GitHub/Analizador-Lexico-Dart/AnalizadorSinDart.py
+LexToken(LAMBDA,'=>',2,1)
+LexToken(ID,'a',3,4)
+LexToken(PLUS,'+',4,6)
+LexToken(ID,'b',5,8)
+LexToken(SEMICOLON,';',6,10)
+LexToken(INT,'int',7,12)
+LexToken(ID,'aver',7,16)
+LexToken(LPAREN,'(',7,20)
+LexToken(INT,'int',7,21)
+LexToken(ID,'a',7,25)
+LexToken(COMA,',',7,26)
+LexToken(INT,'int',7,28)
+LexToken(ID,'b',7,32)
+LexToken(RPAREN,')',7,33)
+LexToken(LAMBDA,'=>',7,35)
+LexToken(ID,'a',7,38)
+LexToken(PLUS,'+',7,40)
+LexToken(ID,'b',7,42)
+LexToken(SEMICOLON,';',7,43)
+dart > int uno = 1;
+{'variables': {'uno': 'int'}, 'tipos': {'str_funciones': ['split', 'contains', 'startsWith', 'endsWith', 'toUpperCase', 'toLowerCase', 'substring', 'trim', 'replaceAll']}}
+None
+dart > int dos = 2;
+{'variables': {'uno': 'int', 'dos': 'int'}, 'tipos': {'str_funciones': ['split', 'contains', 'startsWith', 'endsWith', 'toUpperCase', 'toLowerCase', 'substring', 'trim', 'replaceAll']}}
+None
+dart > uno + dos
+None
+dart > uno + dos;
+Error de sintaxis en la linea 8
+None
+dart > 1 + 2
+None
+dart > float decimal = 1.0;
+{'variables': {'uno': 'int', 'dos': 'int', 'decimal': 'float'}, 'tipos': {'str_funciones': ['split', 'contains', 'startsWith', 'endsWith', 'toUpperCase', 'toLowerCase', 'substring', 'trim', 'replaceAll']}}
+None
+dart > String abc = "abc";
+{'variables': {'uno': 'int', 'dos': 'int', 'decimal': 'float', 'abc': 'String'}, 'tipos': {'str_funciones': ['split', 'contains', 'startsWith', 'endsWith', 'toUpperCase', 'toLowerCase', 'substring', 'trim', 'replaceAll']}}
+None
+dart > abc.split();
+None
+dart > "hola"+"chao"
+None
+dart > uno=3;
+Asignación correcta: uno = 3
+None

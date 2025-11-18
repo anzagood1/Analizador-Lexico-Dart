@@ -68,7 +68,7 @@ tokens = (
              'SEMICOLON',  # lisbllam
              'COMENTARIO',  # anzagood1
              'NULLABLE',
-             'METODO',  # anzagood1
+             #'METODO',  # anzagood1
              'LAMBDA',  # gilmaramg66
              'HASH',  # gilmaramg66
              'COLON',  # gilmaramg66
@@ -81,12 +81,13 @@ tokens = (
              'BIT_NOT',  # gilmaramg66
              'LSHIFT',  # gilmaramg66
              'RSHIFT',  # gilmaramg66
-             'COMA'
+             'COMA',
+            'PUNTO'
          ) + tuple(reserved.values())
 
 # Regular expression rules for simple tokens
 t_COMENTARIO = r'//.*'  # anzagood1
-t_METODO = r'\..*()'  # anzagood1
+#t_METODO = r'\..*()'  # anzagood1
 t_PLUS = r'\+'
 t_MINUS = r'-'
 t_TIMES = r'\*'
@@ -116,6 +117,7 @@ t_BIT_XOR = r'\^'  # gilmaramg66
 t_LSHIFT = r'<<'  # gilmaramg66
 t_RSHIFT = r'>>'  # gilmaramg66
 t_COMA = r'\,'
+t_PUNTO = r'\.'
 
 
 def t_CADENA(t):  # lisbllam

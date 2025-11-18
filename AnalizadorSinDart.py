@@ -1,3 +1,5 @@
+from shutil import copy2
+
 import ply.yacc as yacc
 from AnalizadorLexDart import tokens
 
@@ -5,7 +7,7 @@ from AnalizadorLexDart import tokens
 tabla_simbolos={
     'variables':{},
     'tipos':{
-        'str-funciones':['split','contains','startsWith','endsWith','toUpperCase','toLowerCase','substring','trim','replaceAll']
+        'str_funciones':['split','contains','startsWith','endsWith','toUpperCase','toLowerCase','substring','trim','replaceAll']
     }
 }
 
@@ -87,8 +89,9 @@ def p_declaracion_variables(p):
     tipo_val_upper = valor['type'].upper()
 
     if tipo_var_upper == tipo_val_upper:
-        # Tipos idénticos, todo bien
+        # Tipos identicos todo bien
         tabla_simbolos['variables'][nombre] = tipo_variable
+        print(tabla_simbolos)
 
     elif tipo_var_upper == 'FLOAT' and tipo_val_upper == 'INT':
         # CONVERSIÓN IMPLÍCITA: Se permite guardar int en float
@@ -158,42 +161,69 @@ def p_imprimirexpresion(p):
     'imprimirexpresion : PRINT LPAREN expresion RPAREN SEMICOLON'
 
 def p_expresionaritmetica(p):
-    '''expresionaritmetica : valoresnumericos PLUS valoresnumericos
-                        | valoresnumericos MINUS valoresnumericos
-                        | valoresnumericos TIMES valoresnumericos
-                        | valoresnumericos DIVIDE valoresnumericos
-                        | ID TIMES ID
-                        | ID DIVIDE ID
-                        | ID PLUS ID
-                        | ID MINUS ID
+    '''expresionaritmetica : expresionaritmetica PLUS expresionaritmetica
+                            | expresionaritmetica MINUS expresionaritmetica
+                            | expresionaritmetica TIMES expresionaritmetica
+                            | expresionaritmetica DIVIDE expresionaritmetica
+                            | valoresnumericos
+                            | ID
+                            | LPAREN expresionaritmetica RPAREN
     '''
-    op1 = p[1]
-    op2 = p[3]
-    operador = p[2]
 
-    if isinstance(op1, str):
-        op1 = {'type': tabla_simbolos['variables'].get(op1, 'ERROR'), 'value': op1}
-    if isinstance(op2, str):
-        op2 = {'type': tabla_simbolos['variables'].get(op2, 'ERROR'), 'value': op2}
+    if len(p) == 2:
+        if isinstance(p[1], dict):
+            p[0] = p[1]
+        elif isinstance(p[1], str):
+            tipo = tabla_simbolos['variables'].get(p[1], 'ERROR')
+            p[0] = {'type' : tipo, 'value': p[1]}
+        else:
+            p[0] = {'type' : 'ERROR', 'value': None}
 
-    tipo_final = obtener_tipo_resultante(op1['type'], op2['type'])
+    elif len(p) == 4:
+        if p[1] == '(':
+            p[0] = p[2]
+        else:
+            op1 = p[1]
+            operador = p[2]
+            op2 = p[3]
+            tipo_final = obtener_tipo_resultante(op1['type'], op2['type'])
 
-    if tipo_final:
-        if operador == '/':
-            tipo_final = 'FLOAT'
+            if tipo_final:
+                if operador == '/':
+                    tipo_final = 'FLOAT'
+                p[0] = {'type': tipo_final, 'value': f"{op1['value']} {operador} {op2['value']}"}
+            else:
+                print(
+                    f"Error Semántico: Tipos incompatibles para operación '{operador}': {op1['type']} y {op2['type']}")
+                p[0] = {'type': 'ERROR', 'value': None}
 
-        p[0] = {'type': tipo_final, 'value': f"{op1['value']} {operador} {op2['value']}"}
-    else:
-        print(f"Error Semántico: Tipos incompatibles para operación '{operador}': {op1['type']} y {op2['type']}")
-        p[0] = {'type': 'ERROR', 'value': None}
 def p_expresion(p):
     '''expresion : valor PLUS valor
                 | valor MINUS valor
                 | expresionaritmetica
+                | concatenarcadenas
+
     '''
 
 def p_concatenarcadenas(p):
-    'concatenarcadenas : CADENA PLUS CADENA SEMICOLON'
+    'concatenarcadenas : valor PLUS valor'
+    op1 = p[1]
+    op2 = p[3]
+    if isinstance(op1, str):
+        tipo1 = tabla_simbolos['variables'].get(op1, 'ERROR')
+        op1 = {'type': tipo1, 'value': op1}
+    if isinstance(op2, str):
+        tipo2 = tabla_simbolos['variables'].get(op2, 'ERROR')
+        op2 = {'type': tipo2, 'value': op2}
+
+    if op1['type'].upper() == 'STRING' and op2['type'].upper() == 'STRING':
+        p[0] = {'type': 'STRING', 'value': f"{op1['value']} + {op2['value']}"}
+    else:
+        print(
+            f"Error Semántico: Concatenación solo permitida entre STRING, pero se recibió {op1['type']} y {op2['type']}")
+        p[0] = {'type': 'ERROR', 'value': None}
+
+
 
 def p_parametro(p):
     'parametro : tipodato ID'
@@ -244,6 +274,7 @@ def p_tipodato(p):
                     | FLOAT
                     | BOOL
     '''
+    p[0] = p[1]
 
 def p_forcomparador(p):
     '''forcomparador : MENORQUE
@@ -510,6 +541,22 @@ def p_conversion_explicita(p):
     else:
         print(f"Error Semántico: No se puede castear {origen['type']} a {destino}")
         p[0] = {'type': 'ERROR'}
+
+
+def p_string_methods(p):
+    'valor : ID PUNTO ID LPAREN RPAREN SEMICOLON'
+    nombre = p[1]
+    metodo = p[3]
+    if nombre not in tabla_simbolos['variables']:
+        print(f"Error semantico: la variable {nombre} no ha sido definida.")
+    elif tabla_simbolos["variables"][nombre] != 'String':
+        print(f"Error semantico: la variable {nombre} no corresponde a un str.")
+    else:
+        if metodo in tabla_simbolos['tipos']['str_funciones']:
+            p[0] = "str"
+        else:
+            print(f"Error semantico: el metodo {metodo} no es parte de las funciones de strings.")
+
 
 parser = yacc.yacc()
 
