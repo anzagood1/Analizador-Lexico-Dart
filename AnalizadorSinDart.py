@@ -47,6 +47,7 @@ def p_sentencia(p):
                 | explicitqueue
                 | funcion_asincrona
                 | declaracion_con_await
+                | declaracion_func_retorno
     '''
 
 
@@ -61,11 +62,37 @@ def p_asignacion_variables(p):
 def p_declaracion_variables(p):
     '''declaracion_variables : tipodato ID IGUAL valor SEMICOLON
                             | VAR ID IGUAL valor SEMICOLON'''
+    nombre = p[2]
+    if nombre in tabla_simbolos:
+        print(f"Error semántico: variable {nombre} ya declarada")
+    else:
+        tabla_simbolos[nombre]= p[4]
+        print(tabla_simbolos)
 
 def p_declaracion_func_void(p):
     '''declara_func_void : VOID ID LPAREN RPAREN LBRACKET sentencias RBRACKET
                         | VOID ID LPAREN parametros RPAREN LBRACKET sentencias RBRACKET
     '''
+    nombre = p[2]
+    if 'funciones' not in tabla_simbolos:
+        tabla_simbolos['funciones'] = {}
+    if nombre in tabla_simbolos['funciones']:
+        print(f"Error semántico: funcion {nombre} ya declarada")
+    tabla_simbolos['funciones'][nombre] = {'tipo':'void'}
+
+def p_declaracion_func_retorno(p):
+    'declaracion_func_retorno : tipodato ID LPAREN RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET'
+    nombre = p[2]
+    tipo_retorno = p[1]
+    valor_retorno = p[8]
+    if 'funciones' not in tabla_simbolos:
+        tabla_simbolos['funciones'] = {}
+    if nombre in tabla_simbolos['funciones']:
+        print(f"Error semántico: funcion {nombre} ya declarada")
+    if valor_retorno != tipo_retorno:
+        print(f"Error semántico: tipo de funcion {tipo_retorno} es diferente al tipo de valor de retorno {valor_retorno}")
+    tabla_simbolos['funciones'][nombre] = {'tipo': tipo_retorno}
+
 
 def p_declaracion_list(p):
     '''declaracion_list : tipodato ID IGUAL LCORCH RCORCH SEMICOLON
@@ -76,14 +103,19 @@ def p_declaracion_list(p):
 
 def p_sentenciawhile(p):
     '''sentenciawhile : WHILE LPAREN exp_logica RPAREN LBRACKET sentencias RBRACKET
-                        | WHILE LPAREN exp_logica RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET
-    '''
+                        | WHILE LPAREN exp_logica RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET'''
 
 def p_imprimircadena(p):
     'imprimircadena : PRINT LPAREN CADENA RPAREN SEMICOLON'
+    pass
+
 
 def p_imprimirvariable(p):
     'imprimirvariable : PRINT LPAREN ID RPAREN SEMICOLON'
+    nombre = p[3]
+    if nombre not in tabla_simbolos['variables']:
+        print(f"Error semantico: variable {nombre} no declarada")
+
 
 def p_imprimirexpresion(p):
     'imprimirexpresion : PRINT LPAREN expresion RPAREN SEMICOLON'
@@ -116,7 +148,7 @@ def p_parametros(p):
 
 def p_valorreturn(p):
     '''valorreturn : ID SEMICOLON
-                    | valor
+                    | valor SEMICOLON
     '''
 
 def p_valoresnumericos(p):
@@ -171,8 +203,7 @@ def p_forunarios(p):
 def p_sentenciaif(p):
     '''sentenciaif : IF LPAREN exp_logica RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET
                     | IF LPAREN exp_logica RPAREN LBRACKET sentencias RBRACKET
-    '''
-
+                    '''
 def p_valorbool(p):
     '''valorbool : TRUE
                    | FALSE
