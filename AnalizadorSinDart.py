@@ -53,14 +53,50 @@ def p_sentencia(p):
 def p_asignacion_variables(p):
     'asignacion_variables : ID IGUAL valor SEMICOLON'
     nombre = p[1]
-    tipo = p[3]
-    if tipo != None:
-        tabla_simbolos['variables'][nombre] = tipo
-        print(tabla_simbolos)
+    valor_dict = p[3]
+
+    if nombre in tabla_simbolos['variables']:
+        tipo_existente = tabla_simbolos['variables'][nombre]
+        # Validar que el nuevo valor coincida con el tipo original
+        if tipo_existente.upper() == valor_dict['type'].upper():
+            print(f"Asignación correcta: {nombre} = {valor_dict['value']}")
+        else:
+            print(f"Error Semántico: {nombre} es {tipo_existente}, no se le puede asignar {valor_dict['type']}")
+    else:
+        print(f"Error Semántico: Variable '{nombre}' no declarada.")
+
 
 def p_declaracion_variables(p):
     '''declaracion_variables : tipodato ID IGUAL valor SEMICOLON
                             | VAR ID IGUAL valor SEMICOLON'''
+
+
+    tipo_variable = p[1]
+    nombre = p[2]
+    valor = p[4]  # Esto ahora espera un diccionario {type, value}
+
+    # Lógica de VAR (Inferencia de tipos)
+    if tipo_variable == 'var':
+        tabla_simbolos['variables'][nombre] = valor['type']
+        print(f"Declaración (Inferencia): {nombre} es de tipo {valor['type']}")
+        return
+
+    # Lógica de Tipos Explícitos con Conversión
+    tipo_var_upper = tipo_variable.upper()
+    tipo_val_upper = valor['type'].upper()
+
+    if tipo_var_upper == tipo_val_upper:
+        # Tipos idénticos, todo bien
+        tabla_simbolos['variables'][nombre] = tipo_variable
+
+    elif tipo_var_upper == 'FLOAT' and tipo_val_upper == 'INT':
+        # CONVERSIÓN IMPLÍCITA: Se permite guardar int en float
+        print(f"Aviso: Conversión implícita de INT a FLOAT para variable '{nombre}'")
+        tabla_simbolos['variables'][nombre] = 'FLOAT'  # Se guarda como float
+
+    else:
+        print(
+            f"Error Semántico: No se puede asignar '{tipo_val_upper}' a variable '{nombre}' de tipo '{tipo_var_upper}'")
 
 def p_declaracion_func_void(p):
     '''declara_func_void : VOID ID LPAREN RPAREN LBRACKET sentencias RBRACKET
@@ -76,8 +112,14 @@ def p_declaracion_list(p):
 
 def p_sentenciawhile(p):
     '''sentenciawhile : WHILE LPAREN exp_logica RPAREN LBRACKET sentencias RBRACKET
-                        | WHILE LPAREN exp_logica RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET
+                       | WHILE LPAREN exp_logica RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET
     '''
+    condicion = p[3]
+    if condicion['type'] == 'BOOL':
+        print("Sentencia WHILE válida semánticamente.")
+    else:
+        print(
+            f"Error Semántico en WHILE (línea {p.lineno(1)}): La condición debe ser booleana. Se encontró: {condicion['type']}")
 
 def p_imprimircadena(p):
     'imprimircadena : PRINT LPAREN CADENA RPAREN SEMICOLON'
@@ -95,8 +137,28 @@ def p_expresionaritmetica(p):
                         | valoresnumericos DIVIDE valoresnumericos
                         | ID TIMES ID
                         | ID DIVIDE ID
+                        | ID PLUS ID
+                        | ID MINUS ID
     '''
+    op1 = p[1]
+    op2 = p[3]
+    operador = p[2]
 
+    if isinstance(op1, str):
+        op1 = {'type': tabla_simbolos['variables'].get(op1, 'ERROR'), 'value': op1}
+    if isinstance(op2, str):
+        op2 = {'type': tabla_simbolos['variables'].get(op2, 'ERROR'), 'value': op2}
+
+    tipo_final = obtener_tipo_resultante(op1['type'], op2['type'])
+
+    if tipo_final:
+        if operador == '/':
+            tipo_final = 'FLOAT'
+
+        p[0] = {'type': tipo_final, 'value': f"{op1['value']} {operador} {op2['value']}"}
+    else:
+        print(f"Error Semántico: Tipos incompatibles para operación '{operador}': {op1['type']} y {op2['type']}")
+        p[0] = {'type': 'ERROR', 'value': None}
 def p_expresion(p):
     '''expresion : valor PLUS valor
                 | valor MINUS valor
@@ -124,9 +186,9 @@ def p_valoresnumericos(p):
                         | FLOAT_NUMBER
     '''
     if p.slice[1].type == "NUMBER":
-        p[0] = 'int'
+        p[0] = {'type': 'INT', 'value': p[1]}
     elif p.slice[1].type == "FLOAT_NUMBER":
-        p[0] = 'float'
+        p[0] = {'type': 'FLOAT', 'value': p[1]}
 
 #Estructura Cola
 def p_factoryqueue(p):
@@ -172,11 +234,18 @@ def p_sentenciaif(p):
     '''sentenciaif : IF LPAREN exp_logica RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET
                     | IF LPAREN exp_logica RPAREN LBRACKET sentencias RBRACKET
     '''
+    condicion = p[3]
+    if condicion['type'] == 'BOOL':
+        print("Sentencia IF válida semánticamente.")
+    else:
+        print(
+            f"Error Semántico en IF (línea {p.lineno(1)}): La condición debe ser booleana. Se encontró: {condicion['type']}")
 
 def p_valorbool(p):
     '''valorbool : TRUE
                    | FALSE
     '''
+    p[0] = {'type': 'BOOL', 'value': p[1]}
 
 def p_comparador(p):
     '''comparador : IGUAL IGUAL
@@ -198,13 +267,14 @@ def p_valor(p):
     if token_type == "ID":
         nombre = p[1]
         if nombre not in tabla_simbolos['variables']:
-            print(f"Error semántico: la variable {nombre} no está declarada")
+            tipo_guardado = tabla_simbolos['variables'][nombre]
+            p[0] = {'type': tipo_guardado, 'value': nombre}
         else:
-            p[0] = tabla_simbolos['variables'][nombre]
+            print(f"Error Semántico: Variable '{nombre}' no declarada")
+            p[0] = {'type': 'ERROR', 'value': None}
     elif token_type == "CADENA":
-        p[0] = "str"
+        p[0] = {'type': 'STRING', 'value': p[1]}
     else:
-        # valoresnumericos devuelve 'int' o 'float'
         p[0] = p[1]
 
 #Lambda function
@@ -223,7 +293,22 @@ def p_condition(p):
               | valor comparador valorbool
               | valorbool comparador valor
     '''
+    left = p[1]
+    right = p[3]
+    op = p[2]
 
+    # Validación: Solo comparamos si ambos son numéricos O ambos son booleanos
+    tipos_numericos = ['INT', 'FLOAT']
+
+    es_num = (left['type'].upper() in tipos_numericos) and (right['type'].upper() in tipos_numericos)
+    es_bool = (left['type'] == 'BOOL') and (right['type'] == 'BOOL')
+
+    if es_num or es_bool:
+        # El resultado de una comparación es siempre BOOL
+        p[0] = {'type': 'BOOL', 'value': f"{left['value']} {op} {right['value']}"}
+    else:
+        print(f"Error Semántico: No se pueden comparar tipos incompatibles: {left['type']} con {right['type']}")
+        p[0] = {'type': 'ERROR'}
 #expresiones logicas
 
 def p_exp_logica(p):
@@ -236,6 +321,47 @@ def p_exp_logica(p):
                 | valorbool
                 | ID
     '''
+    # Caso 1: Operaciones Binarias (AND / OR)
+    if len(p) == 4 and p[2] != '(':
+        left = p[1]
+        right = p[3]
+        if left['type'] == 'BOOL' and right['type'] == 'BOOL':
+            p[0] = {'type': 'BOOL', 'value': f"{left['value']} {p[2]} {right['value']}"}
+        else:
+            print(f"Error Semántico: Operación lógica requiere booleanos. Se encontró {left['type']} y {right['type']}")
+            p[0] = {'type': 'ERROR'}
+
+    # Caso 2: NOT
+    elif len(p) == 3:
+        op = p[2]
+        if op['type'] == 'BOOL':
+            p[0] = {'type': 'BOOL', 'value': f"NOT {op['value']}"}
+        else:
+            print("Error Semántico: NOT solo aplica a booleanos")
+            p[0] = {'type': 'ERROR'}
+
+    # Caso 3: Paréntesis
+    elif len(p) == 4 and p[1] == '(':
+        p[0] = p[2]
+
+    # Caso 4: ID (Variable booleana directa)
+    elif len(p) == 2 and isinstance(p[1], str):
+        # Nota: Si entra aquí es un ID crudo que no pasó por p_valor,
+        # pero en tu gramática ID está en p_valor, así que p[1] podría ya ser un dict si viene de una regla anterior.
+        # Si p[1] es string (nombre variable), buscamos:
+        nombre = p[1]
+        if nombre in tabla_simbolos['variables']:
+            if tabla_simbolos['variables'][nombre] == 'BOOL':
+                p[0] = {'type': 'BOOL', 'value': nombre}
+            else:
+                print(f"Error Semántico: Variable '{nombre}' no es booleana.")
+                p[0] = {'type': 'ERROR'}
+        else:
+            # Si no es string, asumimos que es el dict que sube de p_valor o p_condition
+            p[0] = p[1]
+    else:
+        # Condition y Valorbool ya son diccionarios
+        p[0] = p[1]
 
 #Estructura de datos: SET
 
@@ -326,6 +452,38 @@ def p_declaracion_con_await(p):
     '''
 
 
+def obtener_tipo_resultante(tipo1, tipo2):
+    t1 = tipo1.upper()
+    t2 = tipo2.upper()
+
+    if t1 == t2:
+        return t1
+
+    if (t1 == 'INT' and t2 == 'FLOAT') or (t1 == 'FLOAT' and t2 == 'INT'):
+        return 'FLOAT'
+
+    if t1 == 'STRING' or t2 == 'STRING':
+        return 'STRING'
+
+    return None
+
+
+def p_conversion_explicita(p):
+    '''valor : valor AS tipodato'''
+
+    origen = p[1]  # Diccionario {type, value}
+    destino = p[3]  # String 'int', 'float', etc.
+
+    if origen['type'].upper() == 'FLOAT' and destino.upper() == 'INT':
+        p[0] = {'type': 'INT', 'value': f"({origen['value']}).toInt()"}  # O sintaxis Python int()
+
+    elif origen['type'].upper() == 'INT' and destino.upper() == 'FLOAT':
+        p[0] = {'type': 'FLOAT', 'value': f"({origen['value']}).toDouble()"}
+
+    else:
+        print(f"Error Semántico: No se puede castear {origen['type']} a {destino}")
+        p[0] = {'type': 'ERROR'}
+    
 parser = yacc.yacc()
 
 while True:
