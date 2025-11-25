@@ -1,7 +1,7 @@
 import ply.lex as lex
 
 reserved = {
-        "abstract": "ABSTRACT",  # gilmaramg66
+    "abstract": "ABSTRACT",  # gilmaramg66
     "as": "AS",  # gilmaramg66
     "assert": "ASSERT",  # gilmaramg66
     "async": "ASYNC",
@@ -68,7 +68,6 @@ tokens = (
              'SEMICOLON',  # lisbllam
              'COMENTARIO',  # anzagood1
              'NULLABLE',
-             #'METODO',  # anzagood1
              'LAMBDA',  # gilmaramg66
              'HASH',  # gilmaramg66
              'COLON',  # gilmaramg66
@@ -87,7 +86,6 @@ tokens = (
 
 # Regular expression rules for simple tokens
 t_COMENTARIO = r'//.*'  # anzagood1
-#t_METODO = r'\..*()'  # anzagood1
 t_PLUS = r'\+'
 t_MINUS = r'-'
 t_TIMES = r'\*'
@@ -161,7 +159,7 @@ t_ignore = ' \t'
 
 # Error handling rule
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    print(f"Caracter desconocido '{t.value[0]}' en la linea {t.lineno}")
     t.lexer.skip(1)
 
 

@@ -1,7 +1,5 @@
-from shutil import copy2
-
 import ply.yacc as yacc
-from AnalizadorLexDart import tokens
+from AnalizadorLexDart import tokens, lexer
 
 #TABLA DE SIMBOLOS
 tabla_simbolos={
@@ -13,9 +11,43 @@ tabla_simbolos={
 
 start = 'sentencias'
 
+def contiene_return(sentencias):
+    if not sentencias:
+        return False
+    if isinstance(sentencias, str):
+        return 'return' in sentencias
+    if isinstance(sentencias, dict):
+        if sentencias.get('type') == 'RETURN' or sentencias.get('node') == 'RETURN':
+            return True
+        for v in sentencias.values():
+            if contiene_return(v):
+                return True
+        return False
+    if isinstance(sentencias, list):
+        for s in sentencias:
+            if contiene_return(s):
+                return True
+        return False
+    if hasattr(sentencias, 'tiene_return'):
+        try:
+            return sentencias.tiene_return()
+        except Exception:
+            return False
+    return False
+
 def p_sentencias(p):
     '''sentencias : sentencias sentencia
                   | sentencia'''
+    if len(p) == 3:
+        a = p[1]
+        b = p[2]
+        if isinstance(a, list):
+            a.append(b)
+            p[0] = a
+        else:
+            p[0] = [a, b]
+    else:
+        p[0] = p[1]
 
 def p_sentencia(p):
     '''sentencia : declaracion_variables
@@ -51,7 +83,7 @@ def p_sentencia(p):
                 | declaracion_con_await
                 | declaracion_func_retorno
     '''
-
+    p[0] = p[1]
 
 def p_asignacion_variables(p):
     'asignacion_variables : ID IGUAL valor SEMICOLON'
@@ -60,7 +92,6 @@ def p_asignacion_variables(p):
 
     if nombre in tabla_simbolos['variables']:
         tipo_existente = tabla_simbolos['variables'][nombre]
-        # Validar que el nuevo valor coincida con el tipo original
         if tipo_existente.upper() == valor_dict['type'].upper():
             print(f"Asignación correcta: {nombre} = {valor_dict['value']}")
         else:
@@ -111,7 +142,26 @@ def p_declaracion_func_void(p):
         tabla_simbolos['funciones'] = {}
     if nombre in tabla_simbolos['funciones']:
         print(f"Error semántico: funcion {nombre} ya declarada")
-    tabla_simbolos['funciones'][nombre] = {'tipo':'void'}
+        p[0] = {'type': 'ERROR'}
+        return
+    if len(p) == 8:
+        parametros = []
+        sentencias = p[6]
+        linea = p.lineno(1)
+    else:
+        parametros = p[4] or []
+        sentencias = p[7]
+        linea = p.lineno(1)
+    tienereturn = contiene_return(sentencias)
+    if tienereturn:
+        print(f"Error semántico: funcion {nombre} es void y no debe retornar valores.")
+    tabla_simbolos['funciones'][nombre] = {
+        'tipo': 'VOID',
+        'parametros': parametros,
+        'sentencias': sentencias,
+        'linea': linea
+    }
+    p[0] = {'node': 'funcion', 'nombre': nombre, 'tipo': 'VOID'}
 
 def p_declaracion_func_retorno(p):
     'declaracion_func_retorno : tipodato ID LPAREN RPAREN LBRACKET sentencias RETURN valorreturn RBRACKET'
@@ -122,10 +172,23 @@ def p_declaracion_func_retorno(p):
         tabla_simbolos['funciones'] = {}
     if nombre in tabla_simbolos['funciones']:
         print(f"Error semántico: funcion {nombre} ya declarada")
-    if valor_retorno != tipo_retorno:
-        print(f"Error semántico: tipo de funcion {tipo_retorno} es diferente al tipo de valor de retorno {valor_retorno}")
-    tabla_simbolos['funciones'][nombre] = {'tipo': tipo_retorno}
-
+        p[0] = {'type': 'ERROR'}
+        return
+    valor_tipo = None
+    if isinstance(valor_retorno, dict):
+        valor_tipo = valor_retorno.get('type')
+    elif isinstance(valor_retorno, str):
+        valor_tipo = valor_retorno.upper()
+    if valor_tipo is None:
+        print(f"Error semántico: no se pudo determinar tipo de retorno en funcion {nombre}")
+        tabla_simbolos['funciones'][nombre] = {'tipo': 'ERROR'}
+        p[0] = {'type': 'ERROR'}
+        return
+    if str(valor_tipo).upper() != str(tipo_retorno).upper():
+        print(f"Error semántico: tipo de funcion {tipo_retorno} es diferente al tipo de valor de retorno {valor_tipo}")
+    tabla_simbolos['funciones'][nombre] = {'tipo': str(tipo_retorno).upper(), 'return_type': str(valor_tipo).upper(),
+                                           'sentencias': p[6], 'linea': p.lineno(1)}
+    p[0] = {'node': 'funcion', 'nombre': nombre, 'tipo': str(tipo_retorno).upper()}
 
 def p_declaracion_list(p):
     '''declaracion_list : tipodato ID IGUAL LCORCH RCORCH SEMICOLON
@@ -133,6 +196,7 @@ def p_declaracion_list(p):
                         | VAR ID IGUAL LCORCH valoresenlistados RCORCH SEMICOLON
                         | tipodato ID IGUAL LCORCH valoresenlistados RCORCH SEMICOLON
     '''
+    p[0] = p[1]
 
 def p_sentenciawhile(p):
     '''sentenciawhile : WHILE LPAREN exp_logica RPAREN LBRACKET sentencias RBRACKET
@@ -147,7 +211,7 @@ def p_sentenciawhile(p):
 
 def p_imprimircadena(p):
     'imprimircadena : PRINT LPAREN CADENA RPAREN SEMICOLON'
-    pass
+    p[0] = {'type':'VOID'}
 
 
 def p_imprimirvariable(p):
@@ -155,6 +219,9 @@ def p_imprimirvariable(p):
     nombre = p[3]
     if nombre not in tabla_simbolos['variables']:
         print(f"Error semantico: variable {nombre} no declarada")
+        p[0] = {'type': 'ERROR'}
+    else:
+        p[0] = {'type': tabla_simbolos['variables'][nombre]}
 
 
 def p_imprimirexpresion(p):
@@ -227,16 +294,40 @@ def p_concatenarcadenas(p):
 
 def p_parametro(p):
     'parametro : tipodato ID'
+    p[0] = {'tipo': str(p[1]).upper(), 'nombre': p[2]}
 
 def p_parametros(p):
     '''parametros : parametro
                     | parametros COMA parametro
     '''
+    if len(p) == 2:
+        p[0] = [p[1]]
+    else:
+        lst = p[1]
+        lst.append(p[3])
+        p[0] = lst
+
+def p_return_void(p):
+    'return_void : RETURN SEMICOLON'
+    p[0] = {'type': 'RETURN', 'value': None}
+
+def p_return_valor(p):
+    'return_valor : RETURN valor SEMICOLON'
+    p[0] = {'type': 'RETURN', 'value': p[2]}
 
 def p_valorreturn(p):
     '''valorreturn : ID SEMICOLON
                     | valor SEMICOLON
     '''
+    if isinstance(p[1], dict):
+        p[0] = p[1]
+    else:
+        nombre = p[1]
+        if nombre in tabla_simbolos['variables']:
+            p[0] = {'type': tabla_simbolos['variables'][nombre], 'value': nombre}
+        else:
+            print(f"Error Semántico: Variable '{nombre}' no declarada en return")
+            p[0] = {'type': 'ERROR'}
 
 def p_valoresnumericos(p):
     '''valoresnumericos : NUMBER
@@ -251,16 +342,22 @@ def p_valoresnumericos(p):
 def p_factoryqueue(p):
     ''' factoryqueue : QUEUE MENORQUE tipodato MAYORQUE ID IGUAL QUEUE MENORQUE tipodato MAYORQUE LPAREN RPAREN SEMICOLON
     '''
+    p[0] = p[1]
 
 def p_explicitqueue(p):
     ''' explicitqueue : LIST_QUEUE MENORQUE tipodato MAYORQUE ID IGUAL LIST_QUEUE MENORQUE tipodato MAYORQUE LPAREN RPAREN SEMICOLON
         | QUEUE MENORQUE tipodato MAYORQUE ID IGUAL LIST_QUEUE MENORQUE tipodato MAYORQUE LPAREN RPAREN SEMICOLON
     '''
+    p[0] = p[1]
 
 def p_valoresenlistados(p):
     '''valoresenlistados : valor COMA valor
                         | valor COMA valoresenlistados
     '''
+    if len(p) == 4 and isinstance(p[3], list):
+        p[0] = [p[1]] + p[3]
+    else:
+        p[0] = [p[1], p[3]]
 
 def p_sentenciafor(p):
     '''sentenciafor : FOR LPAREN VAR ID IGUAL NUMBER SEMICOLON exp_logica SEMICOLON ID forunarios RPAREN LBRACKET sentencias RBRACKET
@@ -281,11 +378,13 @@ def p_forcomparador(p):
                        | MAYORQUE
                        | NOT IGUAL
     '''
+    p[0] = p[1]
 
 def p_forunarios(p):
     '''forunarios : PLUS PLUS
                         | MINUS MINUS
                          '''
+    p[0] = p[1]
 
 
 def p_sentenciaif(p):
@@ -313,6 +412,7 @@ def p_comparador(p):
                     | MENORQUE
                     | NOT IGUAL
     '''
+    p[0] = p[1]
 
 def p_valor(p):
     '''
@@ -335,14 +435,10 @@ def p_valor(p):
     else:
         p[0] = p[1]
 
-#Lambda function
-
 def p_lambda_function(p):
     '''
     lambda_function : tipodato ID  LPAREN parametros RPAREN LAMBDA expresion SEMICOLON
     '''
-
-#expresiones relacionales
 
 def p_condition(p):
     '''
@@ -355,19 +451,16 @@ def p_condition(p):
     right = p[3]
     op = p[2]
 
-    # Validación: Solo comparamos si ambos son numéricos O ambos son booleanos
     tipos_numericos = ['INT', 'FLOAT']
 
     es_num = (left['type'].upper() in tipos_numericos) and (right['type'].upper() in tipos_numericos)
     es_bool = (left['type'] == 'BOOL') and (right['type'] == 'BOOL')
 
     if es_num or es_bool:
-        # El resultado de una comparación es siempre BOOL
         p[0] = {'type': 'BOOL', 'value': f"{left['value']} {op} {right['value']}"}
     else:
         print(f"Error Semántico: No se pueden comparar tipos incompatibles: {left['type']} con {right['type']}")
         p[0] = {'type': 'ERROR'}
-#expresiones logicas
 
 def p_exp_logica(p):
     '''
@@ -379,7 +472,6 @@ def p_exp_logica(p):
                 | valorbool
                 | ID
     '''
-    # Caso 1: Operaciones Binarias (AND / OR)
     if len(p) == 4 and p[2] != '(':
         left = p[1]
         right = p[3]
@@ -388,8 +480,6 @@ def p_exp_logica(p):
         else:
             print(f"Error Semántico: Operación lógica requiere booleanos. Se encontró {left['type']} y {right['type']}")
             p[0] = {'type': 'ERROR'}
-
-    # Caso 2: NOT
     elif len(p) == 3:
         op = p[2]
         if op['type'] == 'BOOL':
@@ -397,16 +487,9 @@ def p_exp_logica(p):
         else:
             print("Error Semántico: NOT solo aplica a booleanos")
             p[0] = {'type': 'ERROR'}
-
-    # Caso 3: Paréntesis
     elif len(p) == 4 and p[1] == '(':
         p[0] = p[2]
-
-    # Caso 4: ID (Variable booleana directa)
     elif len(p) == 2 and isinstance(p[1], str):
-        # Nota: Si entra aquí es un ID crudo que no pasó por p_valor,
-        # pero en tu gramática ID está en p_valor, así que p[1] podría ya ser un dict si viene de una regla anterior.
-        # Si p[1] es string (nombre variable), buscamos:
         nombre = p[1]
         if nombre in tabla_simbolos['variables']:
             if tabla_simbolos['variables'][nombre] == 'BOOL':
@@ -415,13 +498,9 @@ def p_exp_logica(p):
                 print(f"Error Semántico: Variable '{nombre}' no es booleana.")
                 p[0] = {'type': 'ERROR'}
         else:
-            # Si no es string, asumimos que es el dict que sube de p_valor o p_condition
             p[0] = p[1]
     else:
-        # Condition y Valorbool ya son diccionarios
         p[0] = p[1]
-
-#Estructura de datos: SET
 
 def p_elements(p):
     '''
@@ -559,6 +638,13 @@ def p_string_methods(p):
 
 
 parser = yacc.yacc()
+
+def p_error(p):
+    if p is None:
+        print("Error de sintaxis: se encontró el final inesperado de la entrada.")
+        return
+
+    print(f"Error de sintaxis en la línea {p.lineno}: token inesperado '{p.value}'")
 
 while True:
     try:
