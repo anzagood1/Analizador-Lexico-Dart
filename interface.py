@@ -11,6 +11,7 @@ class WindowElements(tk.Frame):
         self.input_text = scrolledtext.ScrolledText(self.parent, wrap=tk.WORD, height=6, font=("Helvetica", 14))
         self.input_text.grid(row=0, column=0, columnspan=3, sticky="nsew", padx=36, pady=(36, 12))
         self.input_text.insert(tk.END, "Inserta tu código Dart aquí...")
+        self.input_text.config(highlightbackground="#686e73", highlightthickness=1)
 
         # Frame para botones
         self.buttons_frame = tk.Frame(self.parent)
@@ -42,6 +43,7 @@ class WindowElements(tk.Frame):
         self.output_text = scrolledtext.ScrolledText(self.parent, wrap=tk.WORD, height=9, width=40,
                                                     font=("Helvetica", 14), state="disabled")
         self.output_text.grid(row=2, column=2, sticky="nsew", padx=36, pady=(0, 36))
+        self.output_text.config(highlightbackground="#686e73", highlightthickness=1)
 
         # Responsividad
         self.parent.grid_rowconfigure(0, weight=1)
