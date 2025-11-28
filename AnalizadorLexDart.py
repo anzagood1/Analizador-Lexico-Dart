@@ -1,5 +1,8 @@
 import ply.lex as lex
 
+# --- LISTA PARA ERRORES (MODIFICACIÓN PARA INTERFAZ) ---
+errores_lexicos = []
+
 reserved = {
     "abstract": "ABSTRACT",  # gilmaramg66
     "as": "AS",  # gilmaramg66
@@ -18,6 +21,7 @@ reserved = {
     "final": "FINAL",  # lisbllam
     "float": "FLOAT",  # lisbllam
     "for": "FOR",
+    "List": "LIST",
     "Future": "FUTURE",
     "if": "IF",
     "implements": "IMPLEMENTS",  # gilmaramg66
@@ -85,7 +89,6 @@ tokens = (
          ) + tuple(reserved.values())
 
 # Regular expression rules for simple tokens
-t_COMENTARIO = r'//.*'  # anzagood1
 t_PLUS = r'\+'
 t_MINUS = r'-'
 t_TIMES = r'\*'
@@ -117,6 +120,9 @@ t_RSHIFT = r'>>'  # gilmaramg66
 t_COMA = r'\,'
 t_PUNTO = r'\.'
 
+def t_COMENTARIO(t):
+    r'//.*'
+    pass
 
 def t_CADENA(t):  # lisbllam
     r'\'[^\']*\'|\"[^\"]*\"'
@@ -159,29 +165,8 @@ t_ignore = ' \t'
 
 # Error handling rule
 def t_error(t):
-    print(f"Caracter desconocido '{t.value[0]}' en la linea {t.lineno}")
+    errores_lexicos.append(f"Error Léxico: Caracter desconocido '{t.value[0]}' en la linea {t.lineno}")
     t.lexer.skip(1)
-
 
 # Build the lexer
 lexer = lex.lex()
-
-# Test it out
-data = '''
-=>
-a
-+
-b
-;
-int aver(int a, int b) => a + b;
-'''
-
-# Give the lexer some input
-lexer.input(data)
-
-# Tokenize
-while True:
-    tok = lexer.token()
-    if not tok:
-        break  # No more input
-    print(tok)

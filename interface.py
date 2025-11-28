@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import scrolledtext
+import AnalizadorSinDart as analizador
 
 
 class WindowElements(tk.Frame):
@@ -21,7 +22,7 @@ class WindowElements(tk.Frame):
         self.top_spacer = tk.Frame(self.buttons_frame)
         self.top_spacer.pack(side="top", expand=True, fill='y')
 
-        #botones
+        # botones
         self.eval_button = tk.Button(self.buttons_frame, text="Evaluar código", width=21,
                                      command=self.evaluate_code,
                                      font=("Helvetica", 14), bg="#4398e8", activebackground="#006fd6")
@@ -41,7 +42,7 @@ class WindowElements(tk.Frame):
         self.output_label.grid(row=1, column=2, sticky="w", padx=36)
 
         self.output_text = scrolledtext.ScrolledText(self.parent, wrap=tk.WORD, height=9, width=40,
-                                                    font=("Helvetica", 14), state="disabled")
+                                                     font=("Helvetica", 14), state="disabled")
         self.output_text.grid(row=2, column=2, sticky="nsew", padx=36, pady=(0, 36))
         self.output_text.config(highlightbackground="#686e73", highlightthickness=1)
 
@@ -53,13 +54,19 @@ class WindowElements(tk.Frame):
         self.parent.grid_columnconfigure(1, weight=0)
         self.parent.grid_columnconfigure(2, weight=1)
 
-    #funciones (EDITAR CON LA FUNCION RESPECTIVA DE ANALISIS)
+    # funciones (EDITAR CON LA FUNCION RESPECTIVA DE ANALISIS)
 
     def evaluate_code(self):
+        # Obtener el texto del input
         code = self.input_text.get("1.0", tk.END)
+
+        # Ejecutar análisis
+        resultado = analizador.analizar_codigo(code)
+
+        # Mostrar resultados
         self.output_text.config(state="normal")
         self.output_text.delete("1.0", tk.END)
-        self.output_text.insert(tk.END, f"Entrada evaluada:\n{code}")
+        self.output_text.insert(tk.END, resultado)
         self.output_text.config(state="disabled")
 
     def reset_code(self):
@@ -79,8 +86,11 @@ def create_new_window():
 # Configuración base de la ventana principal
 root = tk.Tk()
 root.title("Dart Playground")
-icon = tk.PhotoImage(file="assets/dart.png")
-root.iconphoto(False, icon)
+try:
+    icon = tk.PhotoImage(file="assets/dart.png")
+    root.iconphoto(False, icon)
+except:
+    pass  # Si no encuentra el icono no crashea
 
 # Barra de menú
 menubar = tk.Menu(root)
