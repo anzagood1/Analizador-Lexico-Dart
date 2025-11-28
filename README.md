@@ -42,15 +42,7 @@ Proporciona un entorno visual amigable para el usuario:
 
 ---
 
-## 🛠️ Requisitos e Instalación
-
 ### Prerrequisitos
 * **Python 3.x** instalado.
 * Librería **PLY** (Python Lex-Yacc).
-
-### Instalación
-Ejecuta el siguiente comando en tu terminal para instalar la dependencia necesaria:
-
-
-\* Librería \*\*PLY\*\* (Python Lex-Yacc).
 
